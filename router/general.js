@@ -4,15 +4,11 @@ let books = require("./booksdb.js");
 let { users } = require("./auth_users.js");
 const public_users = express.Router();
 
-/**
- * Simulated Axios GET request
- * Instead of actually calling a remote API, we simulate an async Axios call
- */
 const axiosGet = (url) => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       try {
-        // Simple routing logic for our simulation
+
         const parts = url.split('/');
         if (parts[0] === 'isbn') {
           const isbn = parts[1];
@@ -43,7 +39,7 @@ const axiosGet = (url) => {
           if (books[isbn]) resolve({ data: books[isbn].reviews });
           else reject({ response: { status: 404, data: { message: "Book not found" } } });
         } else if (parts[0] === '') {
-          // Root "/" -> list all books
+
           resolve({ data: books });
         } else {
           reject({ response: { status: 404, data: { message: "Invalid endpoint" } } });
@@ -51,7 +47,7 @@ const axiosGet = (url) => {
       } catch (err) {
         reject({ response: { status: 500, data: { message: "Internal error" } } });
       }
-    }, 100); // simulate 100ms network delay
+    }, 100); 
   });
 };
 
@@ -65,7 +61,7 @@ public_users.get('/', async (req, res) => {
   }
 });
 
-// Get book by ISBN
+// Get book by ISBN (async)
 public_users.get('/isbn/:isbn', async (req, res) => {
   const isbn = req.params.isbn;
   try {
@@ -76,7 +72,7 @@ public_users.get('/isbn/:isbn', async (req, res) => {
   }
 });
 
-// Get books by author
+// Get books by author  (async)
 public_users.get('/author/:author', async (req, res) => {
   const author = req.params.author;
   try {
@@ -87,7 +83,7 @@ public_users.get('/author/:author', async (req, res) => {
   }
 });
 
-// Get books by title
+// Get books by title (async)
 public_users.get('/title/:title', async (req, res) => {
   const title = req.params.title;
   try {
@@ -98,7 +94,7 @@ public_users.get('/title/:title', async (req, res) => {
   }
 });
 
-// Get book reviews
+// Get book reviews (async)
 public_users.get('/review/:isbn', async (req, res) => {
   const isbn = req.params.isbn;
   try {
