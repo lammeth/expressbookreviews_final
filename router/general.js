@@ -1,7 +1,18 @@
 const express = require('express');
+const axios = require('axios'); // Make sure axios is installed
 let books = require("./booksdb.js");
 let { users } = require("./auth_users.js");
 const public_users = express.Router();
+
+// Simulate async fetch function for books
+const fetchBooks = async () => {
+  // Here we simulate an async fetch; normally this could be a DB or API call
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve(books);
+    }, 100); // simulate 100ms delay
+  });
+};
 
 // Register a new user
 public_users.post("/register", (req, res) => {
@@ -16,47 +27,79 @@ public_users.post("/register", (req, res) => {
   return res.status(201).json({ message: "User registered successfully" });
 });
 
-// Get all books
-public_users.get('/', (req, res) => res.status(200).json(books));
+// Get all books (async using Promise / async-await)
+public_users.get('/', async (req, res) => {
+  try {
+    // Using async-await
+    const allBooks = await fetchBooks();
+
+    // You could also demonstrate Axios fetching if you want to hit an API
+    // Example (commented out, not needed for local books object):
+    // const response = await axios.get('https://example.com/books');
+    // const allBooks = response.data;
+
+    return res.status(200).json(allBooks);
+  } catch (err) {
+    return res.status(500).json({ message: "Error fetching books", error: err.message });
+  }
+});
 
 // Get book by ISBN
-public_users.get('/isbn/:isbn', (req, res) => {
+public_users.get('/isbn/:isbn', async (req, res) => {
   const isbn = req.params.isbn;
-  if (books[isbn]) return res.status(200).json(books[isbn]);
-  return res.status(404).json({ message: "Book not found" });
+  try {
+    const allBooks = await fetchBooks();
+    if (allBooks[isbn]) return res.status(200).json(allBooks[isbn]);
+    return res.status(404).json({ message: "Book not found" });
+  } catch (err) {
+    return res.status(500).json({ message: "Error fetching book", error: err.message });
+  }
 });
 
 // Get books by author
-public_users.get('/author/:author', (req, res) => {
+public_users.get('/author/:author', async (req, res) => {
   const author = req.params.author.toLowerCase();
-  const result = {};
+  try {
+    const allBooks = await fetchBooks();
+    const result = {};
+    Object.keys(allBooks).forEach(isbn => {
+      if (allBooks[isbn].author.toLowerCase() === author) result[isbn] = allBooks[isbn];
+    });
 
-  Object.keys(books).forEach(isbn => {
-    if (books[isbn].author.toLowerCase() === author) result[isbn] = books[isbn];
-  });
-
-  if (Object.keys(result).length > 0) return res.status(200).json(result);
-  return res.status(404).json({ message: "No books found for this author" });
+    if (Object.keys(result).length > 0) return res.status(200).json(result);
+    return res.status(404).json({ message: "No books found for this author" });
+  } catch (err) {
+    return res.status(500).json({ message: "Error fetching books by author", error: err.message });
+  }
 });
 
 // Get books by title
-public_users.get('/title/:title', (req, res) => {
+public_users.get('/title/:title', async (req, res) => {
   const title = req.params.title.toLowerCase();
-  const result = {};
+  try {
+    const allBooks = await fetchBooks();
+    const result = {};
+    Object.keys(allBooks).forEach(isbn => {
+      if (allBooks[isbn].title.toLowerCase() === title) result[isbn] = allBooks[isbn];
+    });
 
-  Object.keys(books).forEach(isbn => {
-    if (books[isbn].title.toLowerCase() === title) result[isbn] = books[isbn];
-  });
-
-  if (Object.keys(result).length > 0) return res.status(200).json(result);
-  return res.status(404).json({ message: "No books found with this title" });
+    if (Object.keys(result).length > 0) return res.status(200).json(result);
+    return res.status(404).json({ message: "No books found with this title" });
+  } catch (err) {
+    return res.status(500).json({ message: "Error fetching books by title", error: err.message });
+  }
 });
 
 // Get reviews for a book
-public_users.get('/review/:isbn', (req, res) => {
+public_users.get('/review/:isbn', async (req, res) => {
   const isbn = req.params.isbn;
-  if (books[isbn]) return res.status(200).json({ reviews: books[isbn].reviews });
-  return res.status(404).json({ message: "Book not found" });
+  try {
+    const allBooks = await fetchBooks();
+    if (allBooks[isbn]) return res.status(200).json({ reviews: allBooks[isbn].reviews });
+    return res.status(404).json({ message: "Book not found" });
+  } catch (err) {
+    return res.status(500).json({ message: "Error fetching reviews", error: err.message });
+  }
 });
 
 module.exports.general = public_users;
