@@ -48,23 +48,36 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
   const isbn = req.params.isbn;
   const review = req.query.review;
 
-  if (!req.session.authorization || !req.session.authorization.username) {
-    return res.status(401).json({ message: "You must be logged in to post a review" });
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({ message: "Missing Authorization header" });
   }
 
-  const username = req.session.authorization.username;
-
-  if (!books[isbn]) {
-    return res.status(404).json({ message: "Book not found" });
+  const token = authHeader.split(" ")[1]; // Bearer <token>
+  if (!token) {
+    return res.status(401).json({ message: "Invalid Authorization header" });
   }
 
-  books[isbn].reviews[username] = review;
+  try {
+    const payload = jwt.verify(token, "fingerprint_customer");
+    const username = payload.username;
 
-  return res.status(200).json({
-    message: "Review added/updated successfully",
-    reviews: books[isbn].reviews
-  });
+    if (!books[isbn]) {
+      return res.status(404).json({ message: "Book not found" });
+    }
+
+    // Add or update the review
+    books[isbn].reviews[username] = review;
+
+    return res.status(200).json({
+      message: "Review added/updated successfully",
+      reviews: books[isbn].reviews
+    });
+  } catch (err) {
+    return res.status(401).json({ message: "Invalid or expired token" });
+  }
 });
+
 
 module.exports.authenticated = regd_users;
 module.exports.users = users;
