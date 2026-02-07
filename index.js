@@ -14,7 +14,7 @@ app.use("/customer/auth/*", function auth(req,res,next){
 //Write the authenication mechanism here
 });
  
-//app.use("/", genl_routes);
+app.use("/", genl_routes);
 app.use("/books", genl_routes);
 
 app.use("/customer", customer_routes);
