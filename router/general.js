@@ -1,10 +1,11 @@
 const express = require('express');
 let books = require("./booksdb.js");
-let isValid = require("./auth_users.js").isValid;
-let users = require("./auth_users.js").users;
+//let isValid = require("./auth_users.js").isValid;
+//let users = require("./auth_users.js").users;
 const public_users = express.Router();
 let { users, isValid } = require("./auth_users.js"); 
 
+// Register a new user
 public_users.post("/register", (req, res) => {
   const { username, password } = req.body;
 
