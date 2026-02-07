@@ -6,7 +6,7 @@ const public_users = express.Router();
 
 // Simulate async fetch function for books
 const fetchBooks = async () => {
-  // Here we simulate an async fetch; normally this could be a DB or API call
+
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       resolve(books);
@@ -32,11 +32,6 @@ public_users.get('/', async (req, res) => {
   try {
     // Using async-await
     const allBooks = await fetchBooks();
-
-    // You could also demonstrate Axios fetching if you want to hit an API
-    // Example (commented out, not needed for local books object):
-    // const response = await axios.get('https://example.com/books');
-    // const allBooks = response.data;
 
     return res.status(200).json(allBooks);
   } catch (err) {
