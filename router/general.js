@@ -49,7 +49,6 @@ public_users.get('/author/:author', function (req, res) {
   }
 });
 
-
 // Get all books based on title
 public_users.get('/title/:title', function (req, res) {
   const title = req.params.title.toLowerCase(); // get title from request params
