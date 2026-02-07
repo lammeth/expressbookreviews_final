@@ -8,6 +8,7 @@ app.use(express.json());
 
 // Public routes
 app.use("/", genl_routes);
+app.use("/books", genl_routes);
 
 // Customer routes (login & review)
 app.use("/customer", customer_routes);
